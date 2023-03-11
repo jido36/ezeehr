@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
 {
@@ -88,13 +89,16 @@ class UserController extends Controller
         //     die;
         // }
 
-        $token = $user->createToken($request->email)->plainTextToken;
+        // $token = $user->createToken($request->email)->plainTextToken;
+        $token =  $user->createToken('Token Name')->accessToken;
 
         return response()->json(['status' => true, 'message' => 'access token generated successfully', 'token' => $token], Response::HTTP_OK);
     }
 
     public function authenticate(Request $request)
     {
+        // echo "hello world";
+        // die;
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -104,10 +108,35 @@ class UserController extends Controller
             // $request->session()->regenerate();
             // echo "here";
             // die;
+            // $response = Http::get('http://easyHr.test:8081/oauth/tokens');
+
+            // return $response->json();
             return response()->json(['status' => true, 'message' => 'authentication successful'], Response::HTTP_OK);
         }
 
         return response()->json(['status' => false, 'message' => 'email or password incorrect'], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    public function getToken(Request $request)
+    {
+
+        // $credentials = $request->validate([
+        //     'email' => ['required', 'email'],
+        //     'password' => ['required'],
+        // ]);
+
+        $response = Http::asForm()->post('http://easyHr.test:8081/oauth/token', [
+            'grant_type' => 'password',
+            'client_id' => '8',
+            'client_secret' => '5KQekgu2Xc0D8t3dG86XOYmoIN4Gyts7WHyLDAfr',
+            // 'client_id' => '7',
+            // 'client_secret' => 'vXfN0rPmkgDKuJ6WmwKc7JQVay4xkAgUVMRSS72s',
+            'username' => 'okitikanolugbenga@gmail.com',
+            'password' => 'hello world',
+            'scope' => '',
+        ]);
+
+        return $response->json();
     }
 
     public function logout(Request $request)
@@ -115,5 +144,26 @@ class UserController extends Controller
 
         $request->user()->currentAccessToken()->delete();
         return response()->json(['status' => true, 'message' => 'user logged out'], Response::HTTP_OK);
+    }
+
+    public function getClients(Request $request)
+    {
+        // print_r($request->all());
+        // die;
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required']
+        ]);
+
+        if (Auth::attempt($credentials)) {
+
+            $response = Http::get('http://easyHr.test:8081/oauth/token');
+            // print_r($response);
+            return $response->json();
+
+            // return response()->json(['status' => true, 'message' => 'login attempt successful']);
+        }
+
+        return response()->json(['status' => false, 'message' => 'email or password incorrect'], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }

@@ -1,16 +1,18 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Admin;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-// use Laravel\Sanctum\HasApiTokens;
 use Laravel\Passport\HasApiTokens;
 
-class User extends Authenticatable
+
+
+class AdminUser extends Authenticatable
 {
+
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -19,9 +21,11 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
+        'entity_id'
     ];
 
     /**
@@ -43,18 +47,22 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function certifications()
+    public function company()
     {
-        return $this->hasMany(Certifications::class);
+        return $this->belongsToMany(Company::class, 'admin_user_company');
     }
 
-    public function workexperience()
+    public function roles()
     {
-        return $this->hasMany(Workexperience::class);
+        return $this->belongsToMany(Role::class, 'admin_user_role');
     }
 
-    public function links()
+    public function getRoles()
     {
-        return $this->hasMany(Link::class);
+        $roles = [];
+        foreach ($this->roles as $role) {
+            $roles[] = $role->role;
+        }
+        return $roles;
     }
 }
