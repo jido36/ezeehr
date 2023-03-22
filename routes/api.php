@@ -55,7 +55,8 @@ Route::post('/getclients', [UserController::class, 'getClients']);
 Route::prefix('admin')->group(function () {
     Route::post('/createuser', [AdmiUserController::class, 'createUser']);
     Route::post('/login', [AuthenticationController::class, 'login']);
-    Route::post('/test', [testController::class, 'testValidation']);
+    Route::post('/auth', [AuthenticationController::class, 'authenticate']);
+    Route::get('/test', [testController::class, 'testValidation']);
     // Route::post('/logout', [UserController::class, 'logout']);
     Route::post('/create-company', [CompanyController::class, 'createCompany'])->middleware(['auth:api-admin']);
     Route::get('/dashboard', [PagesController::class, 'dashboard'])->middleware(['auth:api-admin']);

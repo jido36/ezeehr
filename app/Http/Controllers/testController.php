@@ -10,6 +10,7 @@ class testController extends Controller
 
     public function testValidation(Request $request)
     {
+        echo "hello world"; die;
         $request->validate([
             'title' => 'required',
             'author_name' => 'required',

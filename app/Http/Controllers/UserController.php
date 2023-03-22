@@ -25,7 +25,7 @@ class UserController extends Controller
         // print_r($request->all());
         // die;
         $validator = Validator::make($request->all(), [
-            'name' => 'required|max:255',
+            // 'name' => 'required|max:255',
             'email' => 'required|email|unique:users|max:50',
             'confirm_email' => 'required',
             'password' => 'required'
@@ -38,7 +38,7 @@ class UserController extends Controller
         // Retrieve the validated input...
         $validated = $validator->validated();
         $data = [
-            'name' => $validated['name'],
+            // 'name' => $validated['name'],
             'email' => $validated['email'],
             'confirm_email' => $validated['confirm_email'],
             'password' => Hash::make($validated['password'])
@@ -62,43 +62,89 @@ class UserController extends Controller
         // }
     }
 
+    // public function login(Request $request)
+    // {
+
+    //     $validator = Validator::make($request->all(), [
+    //         'email' => 'required|email',
+    //         'password' => 'required'
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json(['status' => false, 'message' => 'Error validating input', 'errors' => $validator->errors()], Response::HTTP_INTERNAL_SERVER_ERROR);
+    //     }
+
+    //     $user = User::where('email', $request->email)->first();
+
+    //     if (!$user || !Hash::check($request->password, $user->password)) {
+    //         return response()->json(['status' => false, 'message' => 'email or password incorrect'], Response::HTTP_INTERNAL_SERVER_ERROR);
+    //     }
+
+    //     $token =  $user->createToken('Token Name')->accessToken;
+    //     return response()->json(['status' => true, 'message' => 'access token generated successfully', 'token' => $token], Response::HTTP_OK);
+    // }
+
     public function login(Request $request)
     {
-        // print_r($request->all());
-        // die;
+
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
+            'client_secret' => '',
+            'client_id' => '',
         ]);
+
+        $validated = $validator->validated();
 
         if ($validator->fails()) {
             return response()->json(['status' => false, 'message' => 'Error validating input', 'errors' => $validator->errors()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        // Retrieve the validated input...
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['status' => false, 'message' => 'email or password incorrect'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        try {
+            //code...
+            $response = Http::asForm()->post(env('APP_URL').'/oauth/token', [
+                'grant_type' => 'password',
+                'client_id' => env('PASSPORT_CANDIDATE_CLIENT_ID'),
+                'client_secret' => env('PASSPORT_CANDIDATE_CLIENT_SECRET'),
+                'username' => $validated['email'],
+                'password' => $validated['password'],
+                'scope' => '',
+            ]);
+        } catch (\Exception $e) {
+            //throw $th;
+            Log::error($e);
+            return response()->json(['status' => false, 'message' => 'User name or password incorrect'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+        $userdata = User::where('email', $validated['email'])->first();
+
+        $ret_userdata = [
+            "id" => $userdata['id'],
+            "email" => $userdata['email'],
+            "created_at" => $userdata['created_at'],
+            "updated_at" => $userdata['updated_at'],
+            // "entity_id" => $userdata['entity_id'],
+            // "role" => "admin"
+        ];
+
+        $ret_response = [
+            'data' => $response->json(),
+            'userdata' => $ret_userdata,
+            // 'userability' => [
+            //     [
+            //         "action" => "manage",
+            //         "subject" => "all"
+            //     ]
+            // ]
+        ];
 
 
-        // foreach ($user->tokens as $token) {
-        //     print_r($token);
-        //     die;
-        // }
-
-        // $token = $user->createToken($request->email)->plainTextToken;
-        $token =  $user->createToken('Token Name')->accessToken;
-
-        return response()->json(['status' => true, 'message' => 'access token generated successfully', 'token' => $token], Response::HTTP_OK);
+        return response()->json($ret_response);
     }
 
     public function authenticate(Request $request)
     {
-        // echo "hello world";
-        // die;
+
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -111,7 +157,9 @@ class UserController extends Controller
             // $response = Http::get('http://easyHr.test:8081/oauth/tokens');
 
             // return $response->json();
-            return response()->json(['status' => true, 'message' => 'authentication successful'], Response::HTTP_OK);
+            $user = User::where('email', $request->email)->first();
+            $token =  $user->createToken('Token Name')->accessToken;
+            return response()->json(['status' => true, 'message' => 'authentication successful', 'token' => $token], Response::HTTP_OK);
         }
 
         return response()->json(['status' => false, 'message' => 'email or password incorrect'], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -157,7 +205,7 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
 
-            $response = Http::get('http://easyHr.test:8081/oauth/token');
+            $response = Http::get('http://ezeehr.test/oauth/token');
             // print_r($response);
             return $response->json();
 
