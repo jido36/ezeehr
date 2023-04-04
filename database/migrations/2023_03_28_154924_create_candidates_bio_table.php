@@ -13,11 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('shift', function (Blueprint $table) {
+        Schema::create('candidates_bio', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
-            $table->dateTime('start');
-            $table->dateTime('end');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->date('dob');
+            $table->string('sex');
+            $table->integer('cid')->references('id')->on('users');
             $table->timestamps();
         });
     }
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('shift');
+        Schema::dropIfExists('candidates_bio');
     }
 };

@@ -17,6 +17,8 @@ use App\Http\Controllers\LinkController;
 use App\Http\Controllers\WorkExperienceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\CandidatesBioController;
+use App\Http\Controllers\Admin\ApplicationsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +42,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/workexperience', [WorkExperienceController::class, 'store']);
     Route::post('/certification', [CertificationController::class, 'store']);
     Route::post('/apply', [ApplicationController::class, 'apply']);
+    Route::post('/candidatebio', [CandidatesBioController::class, 'store']);
 });
 
 
@@ -65,6 +68,11 @@ Route::prefix('admin')->group(function () {
     Route::post('/add-role', [RolesController::class, 'createRole'])->middleware(['auth:api-admin']);
     Route::post('/assign-role', [RolesController::class, 'assignRole'])->middleware(['auth:api-admin']);
 
+    // list applications
+    Route::get('/applications', [ApplicationsController::class, 'listAllApplications'])->middleware(['auth:api-admin']);
+    Route::post('/getapplication', [ApplicationsController::class, 'getCandidateApplication'])->middleware(['auth:api-admin']);
+    Route::post('/comment', [ApplicationsController::class, 'addComment'])->middleware(['auth:api-admin']);
+    Route::post('/update-application', [ApplicationsController::class, 'updateApplication'])->middleware(['auth:api-admin']);
     // test dashboard without authentication.
     Route::get('/test-dashboard', [AdminTestController::class, 'dashboard']);
 });

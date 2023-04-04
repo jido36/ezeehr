@@ -13,10 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('admin_user_role', function (Blueprint $table) {
+        Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->integer('admin_user_id');
-            $table->integer('role_id');
+            $table->string('activity');
+            $table->string('object');
+            $table->integer('object_id');
+            $table->integer('admin_id');
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('admin_user_role');
+        Schema::dropIfExists('activity_logs');
     }
 };

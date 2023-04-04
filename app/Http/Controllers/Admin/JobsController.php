@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Exception;
 use App\Models\Admin\Jobs;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class JobsController extends Controller
 {
@@ -23,11 +24,15 @@ class JobsController extends Controller
             ]
         );
 
+        $user = Auth::user();
+
         $data = [
             'title' => $validated['title'],
             'description' => $validated['description'],
             'skill' => $validated['skill'],
-            'status' => $validated['status']
+            'status' => $validated['status'],
+            'entity_id' => $user->entity_id,
+            'admin_user_id' => $user->id
         ];
 
         try {

@@ -5,11 +5,13 @@ namespace App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Jobs extends Model
+class Comment extends Model
 {
     use HasFactory;
 
+    protected $table = 'application_comments';
+
     protected $fillable = [
-        'title', 'description', 'skill', 'status', 'entity_id', 'admin_user_id'
+        'application_id', 'comments', 'admin_id'
     ];
 }

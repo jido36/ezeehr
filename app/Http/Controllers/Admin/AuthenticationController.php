@@ -33,7 +33,7 @@ class AuthenticationController extends Controller
 
         try {
             //code...
-            $response = Http::asForm()->post(env('APP_URL').'/oauth/token', [
+            $response = Http::asForm()->post(env('APP_URL') . '/oauth/token', [
                 'grant_type' => 'password',
                 'client_id' => env('PASSPORT_ADMIN_CLIENT_ID'),
                 'client_secret' => env('PASSPORT_ADMIN_CLIENT_SECRET'),
@@ -49,7 +49,17 @@ class AuthenticationController extends Controller
             return response()->json(['status' => false, 'message' => 'User name or password incorrect'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+        $ret_response = $response->json();
+
+        if (isset($ret_response['error'])) {
+            return response()->json(['status' => false, 'message' => 'User name or password incorrect'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+
         $userdata = AdminUser::where('email', $validated['email'])->first();
+
+        // print_r($userdata);
+        // die;
 
         $ret_userdata = [
             "id" => $userdata['id'],
@@ -63,7 +73,7 @@ class AuthenticationController extends Controller
         ];
 
         $ret_response = [
-            'data' => $response->json(),
+            'data' => $ret_response,
             'userdata' => $ret_userdata,
             'userability' => [
                 [
@@ -90,7 +100,7 @@ class AuthenticationController extends Controller
         //     $token =  $user->createToken('Token Name')->accessToken;
 
         //     echo $token; die;
-        
+
 
         $credentials = $request->only('email', 'password');
 

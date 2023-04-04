@@ -20,10 +20,27 @@ class RolePolicy
         //
     }
 
+    // public function before(AdminUser $user): bool|null
+    // {
+    //     if (in_array("admin", $user->getRoles())) {
+    //         return true;
+    //     }
+
+    //     return null;
+    // }
+
     public function createRole(AdminUser $user)
     {
-        return in_array("admin", $user->getRoles())
+        // return in_array("admin", $user->getRoles())
+        return in_array("hr", $user->getRoles())
             ? Response::allow()
-            : Response::deny('You do have permission to create roles');;
+            : Response::deny('You do not have permission to create roles');
+    }
+
+    public function assignRole(Adminuser $user)
+    {
+        return in_array("hr", $user->getRoles())
+            ? Response::allow()
+            : Response::deny('You do not have permission to create roles');
     }
 }

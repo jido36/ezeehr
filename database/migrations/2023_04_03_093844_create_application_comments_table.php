@@ -13,10 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('admin_user_role', function (Blueprint $table) {
+        Schema::create('application_comments', function (Blueprint $table) {
             $table->id();
-            $table->integer('admin_user_id');
-            $table->integer('role_id');
+            $table->integer('application_id')->references('id')->on('applications');
+            $table->string('comments');
+            $table->integer('admin_id')->references('id')->on('admin_users');;
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('admin_user_role');
+        Schema::dropIfExists('application_comments');
     }
 };
