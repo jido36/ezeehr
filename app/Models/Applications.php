@@ -23,6 +23,7 @@ class Applications extends Model
         'application_id',
         'cv_id',
         'cover_letter',
-        'applicant_id'
+        'applicant_id',
+        'status'
     ];
 }

@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\Response;
 use App\Models\Admin\Role;
 use App\Policies\Admin\RolePolicy;
+use App\Models\Admin\Applications;
+use App\Policies\Admin\ApplicationsPolicy;
+use App\Models\Admin\Jobs;
+use App\Policies\Admin\JobsPolicy;
 
 // use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -23,6 +27,8 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
         Role::class => RolePolicy::class,
+        Applications::class => ApplicationsPolicy::class,
+        Jobs::class => JobsPolicy::class
     ];
 
     /**

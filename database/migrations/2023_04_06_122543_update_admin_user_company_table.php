@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('applications', function (Blueprint $table) {
-            $table->string('cv_id', 60)->change();
-            $table->string('cover_letter', 60)->change();
+        Schema::table('admin_user_company', function (Blueprint $table) {
+            $table->uuid('company_entity_id');
         });
     }
 
@@ -26,6 +25,5 @@ return new class extends Migration
      */
     public function down()
     {
-        //
     }
 };

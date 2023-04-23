@@ -49,7 +49,7 @@ class AdminUser extends Authenticatable
 
     public function company()
     {
-        return $this->belongsToMany(Company::class, 'admin_user_company');
+        return $this->belongsToMany(Company::class, 'admin_user_company', 'company_id');
     }
 
     public function roles()

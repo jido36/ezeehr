@@ -13,6 +13,8 @@ class AdminUserCompany extends Model
 
     protected $fillable = [
         'admin_user_id',
-        'company_id'
+        'company_id',
+        'entity_id',
+        'company_entity_id'
     ];
 }

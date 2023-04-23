@@ -11,6 +11,12 @@ class Company extends Model
 
     // protected $guarded = ['id'];
     protected $primaryKey = 'entity_id';
+    // cast he key type to string.
+    protected $keyType = 'string';
+
+    protected $fillable = [
+        'name', 'size', 'email', 'entity_id', 'created_by'
+    ];
 
     public function adminuser()
     {

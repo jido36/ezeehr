@@ -43,10 +43,18 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/certification', [CertificationController::class, 'store']);
     Route::post('/apply', [ApplicationController::class, 'apply']);
     Route::post('/candidatebio', [CandidatesBioController::class, 'store']);
+    Route::get('/applications', [ApplicationController::class, 'index']);
 });
 
+Route::get('job/{id}', [ApplicationController::class, 'viewJob']);
 
 
+
+
+// tokenexpired
+Route::get('/tokenexpired', function () {
+    return response()->json(['message' => "Token is expired"], 401);
+})->name('tokenexpired');
 Route::post('/register', [UserController::class, 'create']);
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/auth', [UserController::class, 'authenticate']);
@@ -55,24 +63,33 @@ Route::post('/logout', [UserController::class, 'logout'])->middleware('auth:sanc
 Route::post('/gettoken', [UserController::class, 'getToken']);
 Route::post('/getclients', [UserController::class, 'getClients']);
 
+// Route::prefix('admin')->middleware(['auth:api'])->group(function () {
+
+// }
+
 Route::prefix('admin')->group(function () {
     Route::post('/createuser', [AdmiUserController::class, 'createUser']);
     Route::post('/login', [AuthenticationController::class, 'login']);
     Route::post('/auth', [AuthenticationController::class, 'authenticate']);
     Route::get('/test', [testController::class, 'testValidation']);
     // Route::post('/logout', [UserController::class, 'logout']);
-    Route::post('/create-company', [CompanyController::class, 'createCompany'])->middleware(['auth:api-admin']);
-    Route::get('/dashboard', [PagesController::class, 'dashboard'])->middleware(['auth:api-admin']);
-    Route::post('/create-job', [JobsController::class, 'createJob'])->middleware(['auth:api-admin']);
-    Route::post('/add-user', [AdmiUserController::class, 'addUser'])->middleware(['auth:api-admin']);
-    Route::post('/add-role', [RolesController::class, 'createRole'])->middleware(['auth:api-admin']);
-    Route::post('/assign-role', [RolesController::class, 'assignRole'])->middleware(['auth:api-admin']);
+    Route::middleware(['auth:api-admin'])->group(function () {
+        Route::post('/create-company', [CompanyController::class, 'createCompany']);
+        Route::any('/assign-company', [CompanyController::class, 'assignCompany']);
+        Route::get('/dashboard', [PagesController::class, 'dashboard']);
+        Route::post('/create-job', [JobsController::class, 'createJob']);
+        Route::post('/update-job', [JobsController::class, 'updateJob']);
+        Route::post('/get-job', [JobsController::class, 'getJob']);
+        Route::get('/view-jobs', [JobsController::class, 'index']);
+        Route::post('/add-user', [AdmiUserController::class, 'addUser']);
+        Route::post('/add-role', [RolesController::class, 'createRole']);
+        Route::post('/assign-role', [RolesController::class, 'assignRole']);
 
-    // list applications
-    Route::get('/applications', [ApplicationsController::class, 'listAllApplications'])->middleware(['auth:api-admin']);
-    Route::post('/getapplication', [ApplicationsController::class, 'getCandidateApplication'])->middleware(['auth:api-admin']);
-    Route::post('/comment', [ApplicationsController::class, 'addComment'])->middleware(['auth:api-admin']);
-    Route::post('/update-application', [ApplicationsController::class, 'updateApplication'])->middleware(['auth:api-admin']);
-    // test dashboard without authentication.
-    Route::get('/test-dashboard', [AdminTestController::class, 'dashboard']);
+        // list applications
+        Route::get('/applications', [ApplicationsController::class, 'listAllApplications']);
+        Route::post('/getapplication', [ApplicationsController::class, 'getCandidateApplication']);
+        Route::post('/comment', [ApplicationsController::class, 'addComment']);
+        Route::post('/update-application', [ApplicationsController::class, 'updateApplication']);
+        // test dashboard without authentication.
+    });
 });

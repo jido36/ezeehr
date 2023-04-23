@@ -29,6 +29,7 @@ return new class extends Migration
             $table->uuid('cover_letter');
             $table->integer('applicant_id')->references('id')->on('users');
             $table->timestamps();
+            $table->string('status');
         });
     }
 

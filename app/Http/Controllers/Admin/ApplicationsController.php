@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Admin\Applications as AdminApplications;
 use Illuminate\Http\Request;
-use App\Models\Applications;
+use App\Models\Admin\Applications;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Admin\Comment;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Admin\ActivityLogController;
+use Illuminate\Support\Facades\Gate;
 
 class ApplicationsController extends Controller
 {
@@ -105,25 +106,31 @@ class ApplicationsController extends Controller
     {
         // implement policy for application update.
 
-        $application_id = $request->input('app_id');
+        $response = Gate::inspect('updateApplication', Applications::class);
 
-        $validator = Validator::make($request->all(), [
-            'status' => 'required|string',
-        ]);
+        if ($response->allowed()) {
+            $application_id = $request->input('app_id');
 
-        $validated = $validator->validated();
+            $validator = Validator::make($request->all(), [
+                'status' => 'required|string',
+            ]);
 
-        $data = [
-            'status' => $validated['status']
-        ];
-        try {
-            AdminApplications::find($application_id)->update($data);
-        } catch (\Exception $e) {
-            Log::error($e);
-            return response()->json(['status' => false, 'message' => 'Error updating application, kindly contact the site admin'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            $validated = $validator->validated();
+
+            $data = [
+                'status' => $validated['status']
+            ];
+            try {
+                AdminApplications::find($application_id)->update($data);
+            } catch (\Exception $e) {
+                Log::error($e);
+                return response()->json(['status' => false, 'message' => 'Error updating application, kindly contact the site admin'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+            $admin_id = Auth::id();
+            $activity->log("Application Update", "Application", $application_id, $admin_id);
+            return response()->json(['status' => true, 'message' => 'Application upated successfully'], Response::HTTP_OK);
+        } else {
+            echo $response->message();
         }
-        $admin_id = Auth::id();
-        $activity->log("Application Update", "Application", $application_id, $admin_id);
-        return response()->json(['status' => true, 'message' => 'Application upated successfully'], Response::HTTP_OK);
     }
 }
