@@ -27,7 +27,7 @@ class Company extends Model
     {
         return $this->hasManyThrough(
             Applications::class,
-            Jobs::class,
+            Vacancies::class,
             'entity_id',
             'job_id',
             'entity_id',

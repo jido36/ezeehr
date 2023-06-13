@@ -20,9 +20,9 @@ class ApplicationsController extends Controller
     public function listAllApplications()
     {
         try {
-            $applications = Applications::selectRaw('jobs.title, CONCAT(candidates_bio.first_name, " ", candidates_bio.last_name) AS full_name')
-                ->join('jobs', 'applications.job_id', '=', 'jobs.id')
-                ->join('companies', 'jobs.entity_id', '=', 'companies.entity_id')
+            $applications = Applications::selectRaw('vacancies.title, CONCAT(candidates_bio.first_name, " ", candidates_bio.last_name) AS full_name')
+                ->join('vacancies', 'vacancies.job_id', '=', 'vacancies.id')
+                ->join('companies', 'vacancies.entity_id', '=', 'companies.entity_id')
                 ->join('candidates_bio', 'applications.applicant_id', 'candidates_bio.cid')
                 ->simplePaginate(15);
         } catch (\Exception $e) {
@@ -44,9 +44,9 @@ class ApplicationsController extends Controller
         // echo $application_id;
         // die;
         try {
-            $get_application = Applications::selectRaw('jobs.title, CONCAT(candidates_bio.first_name, " ", candidates_bio.last_name) AS full_name')
-                ->leftJoin('jobs', 'applications.job_id', '=', 'jobs.id')
-                ->leftJoin('companies', 'jobs.entity_id', '=', 'companies.entity_id')
+            $get_application = Applications::selectRaw('vacancies.title, CONCAT(candidates_bio.first_name, " ", candidates_bio.last_name) AS full_name')
+                ->leftJoin('vacancies', 'applications.job_id', '=', 'vacancies.id')
+                ->leftJoin('companies', 'vacancies.entity_id', '=', 'companies.entity_id')
                 ->leftJoin('candidates_bio', 'applications.applicant_id', 'candidates_bio.cid')
                 ->leftJoin('education', 'candidates_bio.cid', 'education.user_id')
                 ->leftJoin('certifications', 'candidates_bio.cid', 'certifications.user_id')

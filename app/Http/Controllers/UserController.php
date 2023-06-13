@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Auth\Events\Registered;
+use App\Jobs\ProcessEmails;
 
 class UserController extends Controller
 {
@@ -46,13 +48,25 @@ class UserController extends Controller
 
 
         try {
-            User::create($data);
+            $user = User::create($data);
+            // event();
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['status' => false, 'message' => 'Error validating input', 'errors' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+        $response = Http::asForm()->post(env('APP_URL') . '/oauth/token', [
+            'grant_type' => 'password',
+            'client_id' => env('PASSPORT_CANDIDATE_CLIENT_ID'),
+            'client_secret' => env('PASSPORT_CANDIDATE_CLIENT_SECRET'),
+            'username' => $validated['email'],
+            'password' => $validated['password'],
+            'scope' => '',
+        ]);
 
-        return response()->json(['status' => true, 'message' => 'beneficiary saved', 'data' => $request->all()], Response::HTTP_OK);
+        // print_r($response->json());
+        // event(new Registered($user));
+        ProcessEmails::dispatch($user);
+        return response()->json(['status' => true, 'message' => 'Your account has been created successfully', 'data' => $response->json()], Response::HTTP_OK);
 
         // print_r($validated);
         // die;
@@ -102,7 +116,7 @@ class UserController extends Controller
 
         try {
             //code...
-            $response = Http::asForm()->post(env('APP_URL').'/oauth/token', [
+            $response = Http::asForm()->post(env('APP_URL') . '/oauth/token', [
                 'grant_type' => 'password',
                 'client_id' => env('PASSPORT_CANDIDATE_CLIENT_ID'),
                 'client_secret' => env('PASSPORT_CANDIDATE_CLIENT_SECRET'),

@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Exception;
-use App\Models\Admin\Jobs;
+use App\Models\Admin\Vacancies;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
-class JobsController extends Controller
+class VacanciesController extends Controller
 {
 
     public function index()
@@ -24,7 +24,7 @@ class JobsController extends Controller
 
         try {
             $user = Auth::user();
-            $listJobs = Jobs::where('entity_id', $user->entity_id)->paginate(20);
+            $listJobs = Vacancies::where('entity_id', $user->entity_id)->paginate(20);
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['status' => false, 'message' => 'Error fetching jobs please contact admin'], 403);
@@ -57,7 +57,7 @@ class JobsController extends Controller
         ];
 
         try {
-            Jobs::create($data);
+            Vacancies::create($data);
         } catch (Exception $e) {
             Log::error($e);
             return response()->json(['status' => false, 'message' => 'error saving job post'], 403);
@@ -92,7 +92,7 @@ class JobsController extends Controller
         ];
 
         try {
-            $update = Jobs::find($jobid)->update($data);
+            $update = Vacancies::find($jobid)->update($data);
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['status' => false, 'message' => 'error saving job post'], 403);
@@ -116,7 +116,7 @@ class JobsController extends Controller
         $validated = $validator->validated();
 
         $user = Auth::user();
-        $job = Jobs::where('id', $validated['job_id'])
+        $job = Vacancies::where('id', $validated['job_id'])
             ->where('entity_id', $user->entity_id)
             ->get();
 

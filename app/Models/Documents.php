@@ -1,15 +1,19 @@
 <?php
 
-namespace App\Models\Admin;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Jobs extends Model
+class Documents extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'title', 'description', 'skill', 'status', 'entity_id', 'admin_user_id'
+        'document_id',
+        'type',
+        'name',
+        'application_id',
+        'applicant_id'
     ];
 }

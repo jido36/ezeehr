@@ -13,14 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('vacancies', function (Blueprint $table) {
+        Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->text('description');
-            $table->string('skill')->nullable();
-            $table->tinyInteger('status');
-            $table->uuid('entity_id')->constrained('companies');
-            $table->integer('admin_user_id')->constrained('admin_users');
+            $table->string('document_id');
+            $table->string('type');
+            $table->string('name');
+            $table->integer('application_id')->references('id')->on('applications');
+            $table->integer('applicant_id')->references('id')->on('users');
             $table->timestamps();
         });
     }
@@ -32,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('jobs');
+        Schema::dropIfExists('documents');
     }
 };

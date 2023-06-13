@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('admin_user_company', function (Blueprint $table) {
-            $table->uuid('company_entity_id');
-        });
+        // Schema::table('admin_user_company', function (Blueprint $table) {
+        //     $table->uuid('company_entity_id');
+        // });
     }
 
     /**

@@ -24,9 +24,9 @@ return new class extends Migration
     {
         Schema::create('applications', function (Blueprint $table) {
             $table->id();
-            $table->integer('job_id')->references('id')->on('jobs');
-            $table->uuid('cv_id');
-            $table->uuid('cover_letter');
+            $table->integer('job_id')->references('id')->on('vacancies');
+            // $table->uuid('cv_id');
+            // $table->uuid('cover_letter');
             $table->integer('applicant_id')->references('id')->on('users');
             $table->timestamps();
             $table->string('status');

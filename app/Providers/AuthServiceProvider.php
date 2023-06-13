@@ -10,7 +10,7 @@ use App\Models\Admin\Role;
 use App\Policies\Admin\RolePolicy;
 use App\Models\Admin\Applications;
 use App\Policies\Admin\ApplicationsPolicy;
-use App\Models\Admin\Jobs;
+use App\Models\Admin\Vacancies;
 use App\Policies\Admin\JobsPolicy;
 
 // use Illuminate\Support\Facades\Gate;
@@ -28,7 +28,7 @@ class AuthServiceProvider extends ServiceProvider
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
         Role::class => RolePolicy::class,
         Applications::class => ApplicationsPolicy::class,
-        Jobs::class => JobsPolicy::class
+        Vacancies::class => JobsPolicy::class
     ];
 
     /**
