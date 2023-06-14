@@ -21,7 +21,7 @@ class ApplicationsController extends Controller
     {
         try {
             $applications = Applications::selectRaw('vacancies.title, CONCAT(candidates_bio.first_name, " ", candidates_bio.last_name) AS full_name')
-                ->join('vacancies', 'vacancies.job_id', '=', 'vacancies.id')
+                ->join('vacancies', 'applications.job_id', '=', 'vacancies.id')
                 ->join('companies', 'vacancies.entity_id', '=', 'companies.entity_id')
                 ->join('candidates_bio', 'applications.applicant_id', 'candidates_bio.cid')
                 ->simplePaginate(15);

@@ -27,6 +27,8 @@ return new class extends Migration
             $table->integer('job_id')->references('id')->on('vacancies');
             // $table->uuid('cv_id');
             // $table->uuid('cover_letter');
+            $table->integer('cv_id')->references('id')->on('documents');
+            $table->integer('coverletter_id')->references('id')->on('documents');
             $table->integer('applicant_id')->references('id')->on('users');
             $table->timestamps();
             $table->string('status');

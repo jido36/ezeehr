@@ -50,6 +50,7 @@ class ApplicationController extends Controller
         ]);
 
 
+
         $validated = $validator->validated();
 
         if ($validator->fails()) {
@@ -67,38 +68,38 @@ class ApplicationController extends Controller
             return response()->json(['status' => true, 'message' => 'You have applied to the position'], Response::HTTP_OK);
         }
 
-
-        $cv = $request->file('cv_id')->store('cv');
-        $cover_letter = $request->file('cover_letter')->store('cover_letter');
         $applicant_id = Auth::id();
-        $data = [
-            'job_id' => $validated['job_id'],
-            // 'cv_id' => $cv,
-            'status' => "",
-            // 'cover_letter' => $cover_letter,
-            'applicant_id' =>  $applicant_id
-        ];
+
 
         try {
+
+            if (!$request->file('cover_letter') == null) {
+                $cover_letter = $request->file('cover_letter')->store('cover_letter');
+
+                $cover_letter_data = [
+                    'document_id' => $cover_letter,
+                    'type' => 'cover_letter',
+                    'name' => '',
+                    'applicant_id' => $applicant_id
+                ];
+
+                $cover_letter_store = Documents::create($cover_letter_data);
+
+                $cover_letter = Documents::where('document_id', $cover_letter)->first();
+                $cover_letter_id = $cover_letter->id;
+            } else {
+                $cover_letter_id = '';
+            }
+            // if (isset($request->file('cover_letter')))
+
+            $data = [
+                'job_id' => $validated['job_id'],
+                'cv_id' => $validated['cv_id'],
+                'coverletter_id' => $cover_letter_id,
+                'status' => "",
+                'applicant_id' =>  $applicant_id
+            ];
             $application = Applications::create($data);
-            $cv_data = [
-                'document_id' => $cv,
-                'type' => 'cv',
-                'name' => '',
-                'application_id' => $application->id,
-                'applicant_id' => $applicant_id
-            ];
-
-            $cover_letter_data = [
-                'document_id' => $cv,
-                'type' => 'cv',
-                'name' => '',
-                'application_id' => $application->id,
-                'applicant_id' => $applicant_id
-            ];
-
-            $cv_store = Documents::create($cv_data);
-            $cover_letter_store = Documents::create($cover_letter_data);
 
             $vacancy = Vacancies::select('vacancies.title as jobtitle', 'companies.name as company')
                 ->leftjoin('companies', 'vacancies.entity_id', 'companies.entity_id')
@@ -107,7 +108,8 @@ class ApplicationController extends Controller
 
             $bio = CandidatesBio::select('first_name')->where('cid', $applicant_id)->get()->first();
         } catch (\Exception $e) {
-            Storage::delete([$cv, $cover_letter]);
+
+            isset($cover_letter) ? Storage::delete([$cover_letter]) : "";
             Log::error($e);
             return response()->json(['status' => false, 'message' => 'Error occured'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -129,15 +131,25 @@ class ApplicationController extends Controller
             // user is logged in
             $user = Auth::guard('api')->user();
             // check if applicant previously applied.
-            $check_application = Vacancies::select('vacancies.title', 'vacancies.description', 'vacancies.skill', 'vacancies.created_at', 'vacancies.status', 'applications.cv_id', 'applications.cover_letter')
+            $check_application = Vacancies::select('vacancies.title', 'vacancies.description', 'vacancies.skill', 'vacancies.created_at', 'vacancies.status', 'applications.cv_id')
                 ->join('applications', 'vacancies.id', '=', 'applications.job_id')
                 ->where('applications.applicant_id', $user->id)
                 ->get();
+
             if ($check_application->count() > 0) {
                 return response()->json(['status' => true, 'message' => 'you have applied for the job', 'data' => $check_application], Response::HTTP_OK);
             } else {
-                $application = Vacancies::find($id);
-                return response()->json(['status' => true, 'data' => $application], Response::HTTP_OK);
+                $vancancy = Vacancies::find($id);
+                // get last updated cv
+                $last_cv = Documents::where('applicant_id', $user->id)
+                    ->where('type', 'cv')
+                    ->get()
+                    ->last();
+                $data = [
+                    'vacancy' => $vancancy,
+                    'cv' => $last_cv->document_id
+                ];
+                return response()->json(['status' => true, 'data' => $data], Response::HTTP_OK);
             }
         } else {
             // user is not logged in (no auth or invalid token)
@@ -169,5 +181,35 @@ class ApplicationController extends Controller
 
     public function deleteCoverLeter()
     {
+    }
+
+    public function uploadDocument(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'cv' => 'required',
+        ]);
+
+
+        $validated = $validator->validated();
+
+        $cv = $request->file('cv')->store('cv');
+        $applicant_id = Auth::id();
+
+        try {
+            $cv_data = [
+                'document_id' => $cv,
+                'type' => 'cv',
+                'name' => '',
+                'applicant_id' => $applicant_id
+            ];
+
+            $cv_store = Documents::create($cv_data);
+            return response()->json(['status' => true, 'message' => 'CV Uploaded Successfully', 'data' => $cv], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            Storage::delete([$cv]);
+            Log::error($e);
+            return response()->json(['status' => false, 'message' => 'Error occured'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

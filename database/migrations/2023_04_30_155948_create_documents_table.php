@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('document_id');
             $table->string('type');
-            $table->string('name');
-            $table->integer('application_id')->references('id')->on('applications');
+            $table->string('name')->nullable();
+            $table->integer('application_id')->references('id')->on('applications')->nullable();
             $table->integer('applicant_id')->references('id')->on('users');
             $table->timestamps();
         });

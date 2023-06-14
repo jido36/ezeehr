@@ -42,6 +42,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::post('/workexperience', [WorkExperienceController::class, 'store']);
     Route::post('/certification', [CertificationController::class, 'store']);
     Route::post('/apply', [ApplicationController::class, 'apply']);
+    Route::post('/upload-cv', [ApplicationController::class, 'uploadDocument']);
     Route::post('/candidatebio', [CandidatesBioController::class, 'store']);
     Route::get('/applications', [ApplicationController::class, 'index']);
 });
