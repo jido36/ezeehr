@@ -2,20 +2,21 @@
 
 namespace App\Providers;
 
-use App\Models\Admin\AdminUser;
-use App\Models\Admin\Company;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Auth\Access\Response;
 use App\Models\Admin\Role;
-use App\Policies\Admin\RolePolicy;
-use App\Models\Admin\Applications;
-use App\Policies\Admin\ApplicationsPolicy;
+use App\Models\Admin\Company;
+use Laravel\Passport\Passport;
+use App\Models\Admin\AdminUser;
 use App\Models\Admin\Vacancies;
+use App\Models\Admin\Applications;
 use App\Policies\Admin\JobsPolicy;
+use App\Policies\Admin\RolePolicy;
+use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Gate;
 
 // use Illuminate\Support\Facades\Gate;
+use App\Policies\Admin\CompanyPolicy;
+use App\Policies\Admin\ApplicationsPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Laravel\Passport\Passport;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -28,7 +29,8 @@ class AuthServiceProvider extends ServiceProvider
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
         Role::class => RolePolicy::class,
         Applications::class => ApplicationsPolicy::class,
-        Vacancies::class => JobsPolicy::class
+        Vacancies::class => JobsPolicy::class,
+        Company::class => CompanyPolicy::class
     ];
 
     /**

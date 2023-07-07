@@ -8,6 +8,9 @@ use Illuminate\Http\Response;
 use App\Models\Certifications;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Candidate\CertificationRequest;
+use App\Http\Services\Candidates\CertificationService;
+use App\Http\Services\Candidates\DocumentService;
 
 class CertificationController extends Controller
 {
@@ -36,38 +39,11 @@ class CertificationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CertificationRequest $request, CertificationService $certificationService, DocumentService $documentService)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'organisation' => 'required|string',
-            'issue_date' => 'required|date_format:Y-m',
-            'expiry_date' => 'nullable|date_format:Y-m',
-        ]);
 
-        $validated = $validator->validated();
-
-        if ($validator->fails()) {
-            return response()->json(['status' => false, 'message' => 'Error validating input', 'errors' => $validator->errors()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        $data = [
-            'name' => $validated['name'],
-            'organisation' => $validated['organisation'],
-            // 'issue_date' => '01-' . $validated['issue_date'] . ' 00:00:00',
-            'issue_date' => $validated['issue_date'] . '-01',
-            // 'expiry_date' => '01-' . $validated['expiry_date'] . ' 00:00:00',
-            'expiry_date' => is_null($validated['expiry_date']) ? null : $validated['expiry_date'] . '-01',
-            'user_id' => Auth::id()
-        ];
-
-        try {
-            Certifications::create($data);
-        } catch (\Exception $e) {
-            Log::error($e);
-            return response()->json(['status' => false, 'message' => 'Error Creating the experience', 'errors' => $validator->errors()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
+        $certificationService->store($request);
+        $documentService->uploadDocument($request);
         return response()->json(['status' => true, 'message' => 'Certification created', 'data' => $request->all()], Response::HTTP_OK);
     }
 

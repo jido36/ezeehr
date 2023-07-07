@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Services\Admin;
 
 use App\Admin\Models\ActivityLog as ModelsActivityLog;
 use App\Http\Controllers\Controller;
@@ -10,9 +10,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Response;
 
 
-class ActivityLogController extends Controller
+class ActivityLogService
 {
-    //
 
     public function log($activity, $object, $object_id, $admin_id)
     {

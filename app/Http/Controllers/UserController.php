@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Http\Response;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
@@ -17,10 +16,6 @@ use App\Jobs\ProcessEmails;
 class UserController extends Controller
 {
     //
-    public $name;
-    public $email;
-    public $password;
-    public $confirm_password;
 
     public function create(Request $request)
     {

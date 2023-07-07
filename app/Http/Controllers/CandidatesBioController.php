@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Response;
 use App\Models\CandidatesBio;
+use App\Http\Requests\Candidate\BioRequest;
+use App\Http\Services\Candidates\BioService;
 
 class CandidatesBioController extends Controller
 {
@@ -37,36 +39,9 @@ class CandidatesBioController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BioRequest $request, BioService $bioservice)
     {
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'dob' => 'required',
-            'sex' => 'required|string',
-        ]);
-
-
-        $validated = $validator->validated();
-
-        if ($validator->fails()) {
-            return response()->json(['status' => false, 'message' => 'Error validating input', 'errors' => $validator->errors()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        $data = [
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'],
-            'dob' => $validated['dob'],
-            'sex' => $validated['sex'],
-            'cid' => Auth::id(),
-        ];
-
-        try {
-            CandidatesBio::firstOrCreate($data);
-        } catch (\Exception $e) {
-            Log::error($e);
-            return response()->json(['status' => false, 'message' => 'Error occured'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $bioservice->store($request);
 
         return response()->json(['status' => true, 'message' => 'Your profile has been updated', 'data' => $request->all()], Response::HTTP_OK);
     }

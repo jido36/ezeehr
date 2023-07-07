@@ -18,6 +18,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\CandidatesBioController;
 use App\Http\Controllers\Admin\ApplicationsController;
+use App\Http\Controllers\Admin\VacanciesController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 /*
@@ -43,6 +44,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::post('/certification', [CertificationController::class, 'store']);
     Route::post('/apply', [ApplicationController::class, 'apply']);
     Route::post('/upload-cv', [ApplicationController::class, 'uploadDocument']);
+    Route::post('/delete-cv', [ApplicationController::class, 'deleteDocument']);
     Route::post('/candidatebio', [CandidatesBioController::class, 'store']);
     Route::get('/applications', [ApplicationController::class, 'index']);
 });
@@ -98,10 +100,10 @@ Route::prefix('admin')->group(function () {
         Route::post('/create-company', [CompanyController::class, 'createCompany']);
         Route::any('/assign-company', [CompanyController::class, 'assignCompany']);
         Route::get('/dashboard', [PagesController::class, 'dashboard']);
-        Route::post('/create-job', [JobsController::class, 'createJob']);
-        Route::post('/update-job', [JobsController::class, 'updateJob']);
-        Route::post('/get-job', [JobsController::class, 'getJob']);
-        Route::get('/view-jobs', [JobsController::class, 'index']);
+        Route::post('/create-job', [VacanciesController::class, 'createJob']);
+        Route::post('/update-job', [VacanciesController::class, 'updateJob']);
+        Route::post('/get-job', [VacanciesController::class, 'getJob']);
+        Route::get('/view-jobs', [VacanciesController::class, 'index']);
         Route::post('/add-user', [AdmiUserController::class, 'addUser']);
         Route::post('/add-role', [RolesController::class, 'createRole']);
         Route::post('/assign-role', [RolesController::class, 'assignRole']);

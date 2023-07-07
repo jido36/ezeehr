@@ -7,7 +7,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 use App\Models\Admin\AdminUser;
 use Illuminate\Auth\Access\Response;
 
-class JobsPolicy
+class CompanyPolicy
 {
     use HandlesAuthorization;
 
@@ -18,20 +18,12 @@ class JobsPolicy
      */
     public function __construct()
     {
-        //
     }
 
-    public function viewJobs(Adminuser $user)
+    public function accessCompany(Adminuser $user)
     {
         return in_array("admin", $user->getRoles())
             ? Response::allow()
-            : Response::deny('You do not have permission to update the record');
-    }
-
-    public function updateJobs(Adminuser $user)
-    {
-        return in_array("hr", $user->getRoles())
-            ? Response::allow()
-            : Response::deny('You do not have permission to update the record');
+            : Response::deny('You do not have permission to make modification(s) to the company record');
     }
 }

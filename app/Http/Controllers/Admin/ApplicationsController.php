@@ -2,135 +2,60 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\Admin\Applications as AdminApplications;
 use Illuminate\Http\Request;
-use App\Models\Admin\Applications;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Admin\Comment;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Services\Admin\ApplicationService;
+use App\Http\Services\Admin\AuthorisationService;
 use App\Http\Controllers\Admin\ActivityLogController;
-use Illuminate\Support\Facades\Gate;
+use App\Http\Services\Admin\ActivityLogService;
+use App\Models\Admin\ActivityLog;
+use App\Models\Admin\Applications as AdminApplications;
+use Exception;
 
 class ApplicationsController extends Controller
 {
     //
-    public function listAllApplications()
+    public function listAllApplications(ApplicationService $applicationservice)
     {
-        try {
-            $applications = Applications::selectRaw('vacancies.title, CONCAT(candidates_bio.first_name, " ", candidates_bio.last_name) AS full_name')
-                ->join('vacancies', 'applications.job_id', '=', 'vacancies.id')
-                ->join('companies', 'vacancies.entity_id', '=', 'companies.entity_id')
-                ->join('candidates_bio', 'applications.applicant_id', 'candidates_bio.cid')
-                ->simplePaginate(15);
-        } catch (\Exception $e) {
-            Log::error($e);
-            return response()->json(['status' => false, 'message' => 'Error fetching data, kindly contact the site admin'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        $no_of_applications = $applications->count();
-        if ($no_of_applications == 0) {
-            return response()->json(['status' => true, 'message' => 'No candidates applications yet', 'data' => $applications], Response::HTTP_OK);
-        } else {
-            return response()->json(['status' => true, 'message' => 'applications fetched successfully', 'data' => $applications], Response::HTTP_OK);
-        }
+        return $applicationservice->listAllApplications();
     }
 
-    public function getCandidateApplication(Request $request)
+    public function getCandidateApplication(Request $request, ApplicationService $applicationservice)
     {
         $application_id = $request->input('app_id');
-        // echo $application_id;
-        // die;
-        try {
-            $get_application = Applications::selectRaw('vacancies.title, CONCAT(candidates_bio.first_name, " ", candidates_bio.last_name) AS full_name')
-                ->leftJoin('vacancies', 'applications.job_id', '=', 'vacancies.id')
-                ->leftJoin('companies', 'vacancies.entity_id', '=', 'companies.entity_id')
-                ->leftJoin('candidates_bio', 'applications.applicant_id', 'candidates_bio.cid')
-                ->leftJoin('education', 'candidates_bio.cid', 'education.user_id')
-                ->leftJoin('certifications', 'candidates_bio.cid', 'certifications.user_id')
-                ->leftJoin('links', 'candidates_bio.cid', 'links.user_id')
-                ->where('applications.id', '=', $application_id)
-                ->get();
-            // ->toSql();
-            $comments = Comment::selectRaw('comments, application_comments.created_at, CONCAT(admin_users.first_name, " ", admin_users.last_name) AS full_name')
-                // where('application_id', $application_id)
-                ->leftJoin('admin_users', 'application_comments.admin_id', 'admin_users.id')->get();
-        } catch (\Exception $e) {
-            Log::error($e);
-            return response()->json(['status' => false, 'message' => 'Error fetching application data, kindly contact the site admin'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
 
-        // print_r($get_application);
-        // die;
-        $data = [
-            'application' => $get_application,
-            'comments' => $comments
-        ];
+        $candidate_application = $applicationservice->getCandidateApplication($application_id);
 
-        return response()->json(['status' => true, 'message' => 'applications fetched successfully', 'data' => $data], Response::HTTP_OK);
+        return $candidate_application;
     }
 
-    public function addComment(Request $request)
+    public function addComment(Request $request, ApplicationService $applicationService)
     {
-        $application_id = $request->input('app_id');
-        $user_id = Auth::id();
-
-        $validator = Validator::make($request->all(), [
-            'comment' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['status' => false, 'message' => 'comment cannot be empty', 'errors' => $validator->errors()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        $validated = $validator->validated();
-
-        $data = [
-            'application_id' =>  $application_id,
-            'comments' => $validated['comment'],
-            'admin_id' => $user_id
-        ];
-
-        try {
-            Comment::create($data);
-        } catch (\Exception $e) {
-            Log::error($e);
-            return response()->json(['status' => false, 'message' => 'Error adding comment, kindly contact the site admin'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-        return response()->json(['status' => true, 'message' => 'comment added successfully', 'data' => $request->all()], Response::HTTP_OK);
+        $comment = $applicationService->addComment($request);
+        return $comment;
     }
 
-    public function updateApplication(Request $request, ActivityLogController $activity)
+    public function updateApplication(Request $request, ApplicationService $applicationService, AuthorisationService $authorisationservice, ActivityLogService $activity)
     {
         // implement policy for application update.
-
-        $response = Gate::inspect('updateApplication', Applications::class);
-
-        if ($response->allowed()) {
-            $application_id = $request->input('app_id');
-
-            $validator = Validator::make($request->all(), [
-                'status' => 'required|string',
-            ]);
-
-            $validated = $validator->validated();
-
-            $data = [
-                'status' => $validated['status']
-            ];
-            try {
-                AdminApplications::find($application_id)->update($data);
-            } catch (\Exception $e) {
-                Log::error($e);
-                return response()->json(['status' => false, 'message' => 'Error updating application, kindly contact the site admin'], Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
-            $admin_id = Auth::id();
-            $activity->log("Application Update", "Application", $application_id, $admin_id);
-            return response()->json(['status' => true, 'message' => 'Application upated successfully'], Response::HTTP_OK);
-        } else {
-            echo $response->message();
+        try {
+            $authorisationservice->updateApplication();
+        } catch (Exception $e) {
+            abort(400, $e->getMessage());
         }
+
+
+        $update_application = $applicationService->updateApplication($request);
+
+        if (isset($update_application['app_id'])) {
+            $activity->log("Application Update", "Application", $update_application['app_id'], $update_application['admin_id']);
+        }
+
+        return response()->json(['status' => true, 'message' => 'Application updated successfully'], Response::HTTP_OK);
     }
 }

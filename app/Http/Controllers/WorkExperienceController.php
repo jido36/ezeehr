@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Response;
-use App\Models\WorkExperience;
+use App\Http\Requests\Candidate\WorkExperienceRequest;
+use App\Http\Services\Candidates\WorkExperienceService;
+
 
 class WorkExperienceController extends Controller
 {
@@ -37,41 +36,10 @@ class WorkExperienceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(WorkExperienceRequest $request, WorkExperienceService $workExperienceService)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string',
-            'company' => 'required|string',
-            'description' => 'required|string',
-            'from' => 'required|date_format:Y-m',
-            'to' => 'nullable|date_format:Y-m',
-            'workhere' => 'required|integer',
-            'location' => 'required|string',
-        ]);
 
-        $validated = $validator->validated();
-
-        if ($validator->fails()) {
-            return response()->json(['status' => false, 'message' => 'Error validating input', 'errors' => $validator->errors()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        $data = [
-            'title' => $validated['title'],
-            'company' => $validated['company'],
-            'description' => $validated['description'],
-            'from' => $validated['from'] . '-01',
-            'to' => is_null($validated['to']) ? null : $validated['to'],
-            'workhere' => $validated['workhere'],
-            'location' => $validated['location'],
-            'user_id' => Auth::id()
-        ];
-
-        try {
-            WorkExperience::create($data);
-        } catch (\Exception $e) {
-            Log::error($e);
-            return response()->json(['status' => false, 'message' => 'Error adding work experience', 'errors' => $validator->errors()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $workExperienceService->store($request);
 
         return response()->json(['status' => true, 'message' => 'Education added', 'data' => $request->all()], Response::HTTP_OK);
     }

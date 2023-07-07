@@ -22,6 +22,7 @@ class ApplicationConfirmation extends Mailable
 
     public function __construct($application)
     {
+
         $this->application = $application;
         // print_r($this->application);
         // die;
@@ -35,7 +36,7 @@ class ApplicationConfirmation extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'We received your application for the ' . $this->application['jobTitle'] . ' position at ' . $this->application['company'],
+            subject: 'We received your application for the ' . $this->application->jobTitle . ' position at ' . $this->application->company,
         );
     }
 
@@ -49,9 +50,9 @@ class ApplicationConfirmation extends Mailable
         return new Content(
             view: 'applicationconfirmation1',
             with: [
-                'applicantName' => $this->application['applicantName'],
-                'jobTitle' => $this->application['jobTitle'],
-                'company' => $this->application['company']
+                'applicantName' => $this->application->applicantName,
+                'jobTitle' => $this->application->jobTitle,
+                'company' => $this->application->company
             ],
         );
     }
