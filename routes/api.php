@@ -20,6 +20,8 @@ use App\Http\Controllers\CandidatesBioController;
 use App\Http\Controllers\Admin\ApplicationsController;
 use App\Http\Controllers\Admin\VacanciesController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\Admin\stageController;
+use App\Http\Controllers\Admin\StageTypeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -113,6 +115,12 @@ Route::prefix('admin')->group(function () {
         Route::post('/getapplication', [ApplicationsController::class, 'getCandidateApplication']);
         Route::post('/comment', [ApplicationsController::class, 'addComment']);
         Route::post('/update-application', [ApplicationsController::class, 'updateApplication']);
+
+        Route::post('/stage-type-create', [StageTypeController::class, 'store']);
+        Route::post('/stage-type-update', [StageTypeController::class, 'update']);
+
+        Route::post('/stage-create', [stageController::class, 'store']);
+        Route::post('/stage-update', [stageController::class, 'update']);
         // test dashboard without authentication.
     });
 });

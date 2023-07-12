@@ -33,7 +33,8 @@ class VacanciesService
             'skill' => $request->input('skill'),
             'status' => $request->input('status'),
             'entity_id' => $user->entity_id,
-            'admin_user_id' => $user->id
+            'admin_user_id' => $user->id,
+            'stage_type_id' => $request->input('stage_type_id')
         ];
 
         try {

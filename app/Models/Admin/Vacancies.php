@@ -11,7 +11,7 @@ class Vacancies extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'description', 'skill', 'status', 'entity_id', 'admin_user_id'
+        'title', 'description', 'skill', 'status', 'entity_id', 'admin_user_id', 'stage_type_id'
     ];
 
     public function applications(): HasMany

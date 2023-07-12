@@ -2,14 +2,15 @@
 
 namespace App\Http\Services\Admin;
 
+use App\Models\Admin\Stage;
 use App\Models\Admin\Comment;
 use Illuminate\Http\Response;
 use App\Models\Admin\Applications;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Admin\Applications as AdminApplications;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use App\Models\Admin\Applications as AdminApplications;
 
 class ApplicationService
 {
@@ -42,8 +43,11 @@ class ApplicationService
     {
 
         try {
-            $get_application = Applications::with(['comments', 'vacancies:id,title', 'certifications', 'applicationCv:id,document_id', 'applicationCoverLetter:id,document_id'])
-                ->where('id', '=', $application_id)->get();
+            $get_application = Applications::with(['comments', 'vacancies:id,title,stage_type_id', 'certifications', 'applicationCv:id,document_id', 'applicationCoverLetter:id,document_id'])
+                ->where('id', '=', $application_id)->first();
+            $stage_id = $get_application->vacancies->stage_type_id;
+            $stages = Stage::select('id', 'title')
+                ->where('stage_type_id', $stage_id)->get();
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['status' => false, 'message' => 'Error fetching application data, kindly contact the site admin'], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -51,6 +55,7 @@ class ApplicationService
 
         $data = [
             'application' => $get_application,
+            'stages' => $stages
         ];
 
         return response()->json(['status' => true, 'message' => 'applications fetched successfully', 'data' => $data], Response::HTTP_OK);

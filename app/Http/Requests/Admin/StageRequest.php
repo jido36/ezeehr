@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateJobRequest extends FormRequest
+class StageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,12 +24,10 @@ class CreateJobRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'skill' => 'string',
-            'status' => 'required|integer',
-            'stage_type_id' => 'required|integer|exists:stage_types,id'
-            // 'jobid' => ''
+            'title' => 'required|string|unique:stages',
+            'description' => 'string',
+            'order' => 'integer',
+            'stage_type_id' => 'integer|exists:stage_types,id'
         ];
     }
 }

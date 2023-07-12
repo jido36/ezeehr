@@ -5,10 +5,12 @@ namespace App\Models\Admin;
 use App\Models\Admin\Vacancies;
 use App\Models\CandidatesBio;
 use App\Models\Documents;
+use App\Models\Vacancies as ModelsVacancies;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Applications extends Model
