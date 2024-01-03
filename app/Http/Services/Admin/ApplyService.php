@@ -2,6 +2,7 @@
 
 namespace App\Http\Services\Admin;
 
+use App\Jobs\CommentAdded;
 use App\Models\Admin\Stage;
 use App\Models\Admin\Comment;
 use Illuminate\Http\Response;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use App\Models\Admin\Applications as AdminApplications;
 
-class ApplicationService
+class ApplyService
 {
     protected $user;
 
@@ -83,7 +84,8 @@ class ApplicationService
         ];
 
         try {
-            Comment::create($data);
+            $comment = Comment::create($data);
+            CommentAdded::dispatch($comment);
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['status' => false, 'message' => 'Error adding comment, kindly contact the site admin'], Response::HTTP_INTERNAL_SERVER_ERROR);

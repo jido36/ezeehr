@@ -105,6 +105,7 @@ class UserController extends Controller
 
         $validated = $validator->validated();
 
+
         if ($validator->fails()) {
             return response()->json(['status' => false, 'message' => 'Error validating input', 'errors' => $validator->errors()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -125,30 +126,45 @@ class UserController extends Controller
             return response()->json(['status' => false, 'message' => 'User name or password incorrect'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+
+        // if (isset($response->json()['error'])) {
+        //     return response()->json(['status' => false, 'message' => 'User name or password incorrect'], Response::HTTP_UNAUTHORIZED);
+        // }
+
         $userdata = User::where('email', $validated['email'])->first();
 
         $ret_userdata = [
             "id" => $userdata['id'],
             "email" => $userdata['email'],
+            "password" => $userdata['password'],
             "created_at" => $userdata['created_at'],
             "updated_at" => $userdata['updated_at'],
+            "fullName" => " John Doe",
+            "role" => "admin"
             // "entity_id" => $userdata['entity_id'],
             // "role" => "admin"
         ];
 
+        // $token = $response->json();
+
+        // echo $token['access_token'];
+
         $ret_response = [
+            'status' => true,
             'data' => $response->json(),
-            'userdata' => $ret_userdata,
-            // 'userability' => [
-            //     [
-            //         "action" => "manage",
-            //         "subject" => "all"
-            //     ]
-            // ]
+            'accessToken' => $response->json()['access_token'],
+            'userData' => $ret_userdata,
+            'userAbilities' => [
+                [
+                    "action" => "manage",
+                    "subject" => "all"
+                ]
+            ]
         ];
 
 
         return response()->json($ret_response);
+        // return $response->json();
     }
 
     public function authenticate(Request $request)

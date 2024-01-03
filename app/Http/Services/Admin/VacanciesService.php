@@ -68,16 +68,16 @@ class VacanciesService
         return response()->json(['status' => true, 'message' => 'Job updated successfully'], 200);
     }
 
-    public function getJob($request)
+    public function getJob($job_id)
     {
-        $validator = Validator::make($request->all(), [
-            'job_id' => 'required|integer',
-        ]);
+        // $validator = Validator::make($request->all(), [
+        //     'job_id' => 'required|integer',
+        // ]);
 
-        $validated = $validator->validated();
+        // $validated = $validator->validated();
 
         $user = Auth::user();
-        $job = Vacancies::where('id', $validated['job_id'])
+        $job = Vacancies::where('id', $job_id)
             ->where('entity_id', $user->entity_id)
             ->get();
 

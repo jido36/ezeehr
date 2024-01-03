@@ -52,7 +52,7 @@ class VacanciesController extends Controller
         return $vacanciesservice->updateJob($request);
     }
 
-    public function getJob(Request $request, AuthorisationService $authorisationservice, VacanciesService $vacanciesservice)
+    public function getJob($job_id, AuthorisationService $authorisationservice, VacanciesService $vacanciesservice)
     {
         try {
 
@@ -61,6 +61,6 @@ class VacanciesController extends Controller
             abort(422, "You do not have the rights to view this page");
         }
 
-        return $vacanciesservice->getJob($request);
+        return $vacanciesservice->getJob($job_id);
     }
 }

@@ -28,13 +28,14 @@ class DocumentService
         $type = $request->input('type');
 
         $document = $request->file('document')->store($type);
+        $name = $request->file('document')->getClientOriginalName();
         $applicant_id = Auth::id();
 
         try {
             $document_data = [
                 'document_id' => $document,
                 'type' => $request->input('type'),
-                'name' => '',
+                'name' => $name,
                 'applicant_id' => $applicant_id
             ];
 

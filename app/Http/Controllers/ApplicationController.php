@@ -12,11 +12,18 @@ use App\Http\Services\Candidates\DocumentService;
 
 class ApplicationController extends Controller
 {
-    //
+    public $applicationService;
 
-    public function index(ApplicationService $applicationservice)
+    public function __construct(ApplicationService $applicationService)
     {
-        $applications = $applicationservice->getAllApplications();
+        $this->applicationService = $applicationService;
+    }
+
+    public function index()
+    {
+        // $applications = $this->applicationservice->getAllApplications();
+
+        $applications = $this->applicationService->getAllApplications();
 
         return response()->json(['status' => true, 'message' => 'applications fetched successfully', 'data' => $applications], Response::HTTP_OK);
     }

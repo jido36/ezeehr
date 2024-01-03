@@ -19,7 +19,7 @@ class ApplicationService
     {
         $id = Auth::id();
         try {
-            $applications = Applications::select('applications.status', 'vacancies.title', 'companies.name')
+            $applications = Applications::select('applications.id', 'applications.status', 'vacancies.title', 'companies.name', 'applications.created_at')
                 ->join('candidates_bio', 'candidates_bio.cid', '=', 'applications.applicant_id',)
                 ->join('vacancies', 'vacancies.id', '=', "applications.job_id")
                 ->join('companies', 'companies.entity_id', '=', 'vacancies.entity_id')
@@ -123,6 +123,19 @@ class ApplicationService
             // user is not logged in (no auth or invalid token)
             $application = Vacancies::find($id);
             return response()->json(['status' => true, 'data' => $application], Response::HTTP_OK);
+        }
+    }
+
+    public function getApplicactionById($id)
+    {
+
+        $userId = Auth::id();
+        $application = Applications::find($id)->where('user', $userId)->get();
+
+        if ($application->count($application) > 0) {
+            return $application;
+        } else {
+            abort(422, "You cannot view this application");
         }
     }
 }

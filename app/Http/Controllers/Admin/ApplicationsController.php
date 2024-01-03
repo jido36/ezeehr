@@ -9,38 +9,40 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Services\Admin\ApplicationService;
+use App\Http\Services\Admin\ApplyService;
 use App\Http\Services\Admin\AuthorisationService;
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Services\Admin\ActivityLogService;
 use App\Models\Admin\ActivityLog;
 use App\Models\Admin\Applications as AdminApplications;
 use Exception;
+use App\Jobs\CommentAdded;
 
 class ApplicationsController extends Controller
 {
     //
-    public function listAllApplications(ApplicationService $applicationservice)
+    public function listAllApplications(ApplyService $ApplyService)
     {
-        return $applicationservice->listAllApplications();
+        return $ApplyService->listAllApplications();
     }
 
-    public function getCandidateApplication(Request $request, ApplicationService $applicationservice)
+    public function getCandidateApplication(Request $request, ApplyService $ApplyService)
     {
         $application_id = $request->input('app_id');
 
-        $candidate_application = $applicationservice->getCandidateApplication($application_id);
+        $candidate_application = $ApplyService->getCandidateApplication($application_id);
 
         return $candidate_application;
     }
 
-    public function addComment(Request $request, ApplicationService $applicationService)
+    public function addComment(Request $request, ApplyService $ApplyService)
     {
-        $comment = $applicationService->addComment($request);
+        $comment = $ApplyService->addComment($request);
+
         return $comment;
     }
 
-    public function updateApplication(Request $request, ApplicationService $applicationService, AuthorisationService $authorisationservice, ActivityLogService $activity)
+    public function updateApplication(Request $request, ApplyService $ApplyService, AuthorisationService $authorisationservice, ActivityLogService $activity)
     {
         // implement policy for application update.
         try {
@@ -50,7 +52,7 @@ class ApplicationsController extends Controller
         }
 
 
-        $update_application = $applicationService->updateApplication($request);
+        $update_application = $ApplyService->updateApplication($request);
 
         if (isset($update_application['app_id'])) {
             $activity->log("Application Update", "Application", $update_application['app_id'], $update_application['admin_id']);

@@ -104,7 +104,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [PagesController::class, 'dashboard']);
         Route::post('/create-job', [VacanciesController::class, 'createJob']);
         Route::post('/update-job', [VacanciesController::class, 'updateJob']);
-        Route::post('/get-job', [VacanciesController::class, 'getJob']);
+        Route::post('/get-job/{job_id}', [VacanciesController::class, 'getJob']);
         Route::get('/view-jobs', [VacanciesController::class, 'index']);
         Route::post('/add-user', [AdmiUserController::class, 'addUser']);
         Route::post('/add-role', [RolesController::class, 'createRole']);
