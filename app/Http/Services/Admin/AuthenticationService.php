@@ -1,6 +1,6 @@
 <?php
 
-namespace App\http\Services\Admin;
+namespace App\Http\Services\Admin;
 
 use App\Models\Admin\AdminUser;
 use Illuminate\Support\Facades\Log;

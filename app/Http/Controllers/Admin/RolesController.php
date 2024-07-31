@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Services\Admin\AuthorisationService;
-use App\http\Services\Admin\RoleService;
+use App\Http\Services\Admin\RoleService;
 
 
 class RolesController extends Controller

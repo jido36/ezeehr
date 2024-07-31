@@ -95,6 +95,7 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
+        
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -176,6 +177,7 @@ class UserController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
+            // echo "here"; die;
             // $request->session()->regenerate();
             // echo "here";
             // die;

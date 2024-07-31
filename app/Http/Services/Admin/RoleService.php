@@ -1,6 +1,6 @@
 <?php
 
-namespace App\http\Services\Admin;
+namespace App\Http\Services\Admin;
 
 use Exception;
 use App\Models\Admin\Role;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Services\Admin;
+namespace App\Http\Services;
 
 use Illuminate\Http\Response;
 use App\Models\Admin\Applications;
